@@ -20,14 +20,18 @@ build-apkovl:
 	cp apkovl/localhost.apkovl.tar.gz ./localhost.apkovl.tar.gz
 	# Decompress the gzip file
 	gzip -d localhost.apkovl.tar.gz
+
 	# Temporarily change directory to 'apkovl' and update the tarball with specific files, then return
 	# to the original directory
 	# pushd apkovl && tar -uf ../localhost.apkovl.tar etc/network/interfaces --owner=0 --group=0
 	# pushd apkovl && tar -uf ../localhost.apkovl.tar opt/tinybox/takeover.sh --owner=0 --group=0
+	# pushd apkovl && tar -uf ../localhost.apkovl.tar etc/init.d/takeover --owner=0 --group=0
 	(cd apkovl && tar -uf ../localhost.apkovl.tar etc/passwd --owner=0 --group=0)
 	(cd apkovl && tar -uf ../localhost.apkovl.tar etc/shadow --owner=0 --group=0)
 	(cd apkovl && tar -uf ../localhost.apkovl.tar etc/network/interfaces --owner=0 --group=0)
 	(cd apkovl && tar -uf ../localhost.apkovl.tar opt/tinybox/takeover.sh --owner=0 --group=0)
+	(cd apkovl && tar -uf ../localhost.apkovl.tar etc/init.d/takeover --owner=0 --group=0)
+
 	# generate a new apkovl
 	# Compress the updated tarball
 	gzip localhost.apkovl.tar

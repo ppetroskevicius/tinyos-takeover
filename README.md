@@ -54,7 +54,7 @@ to build an iso that can be loaded over the BMC.
 │   ├── initramfs-lts                        - initial RAM filesystem image used during the boot process in Alpine
 │   ├── syslinux                             - lighweight bootloader for Linux
 │   │   ├── boot.cat                         - boot catalog file for bootable ISO images for booting from CD-ROMs
-│   │   ├── isohdpfx.bin                     - master boot record (MBR) code 
+│   │   ├── isohdpfx.bin                     - master boot record (MBR) code
 │   │   ├── isolinux.bin                     - code for booting Linux from ISO images
 │   │   ├── ldlinux.c32                      - main code which is run by the bootloader to boot the Linux
 │   │   ├── libcom32.c32                     - COM32 module library
@@ -75,3 +75,4 @@ to build an iso that can be loaded over the BMC.
 ├── flake.nix                                - Nix packages (flakes) manager file
 └── img.sh
 ```
+the takeover image will fetch for an image from a http server, and flash it to the tinybox after doing some checks.

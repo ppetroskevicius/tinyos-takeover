@@ -5,6 +5,11 @@ set -x
 
 sleep 1
 
+# list of hosts to check for updates
+UPDATE_URLS="http://192.168.52.20:2543/takeover.sh http://192.168.52.16:2543/takeover.sh https://raw.githubusercontent.com/tinygrad/tinyos-takeover/main/apkovl/opt/tinybox/takeover.sh"
+# list of hosts to fetch the image from
+IMG_HOSTS="http://192.168.52.20:2543 http://192.168.52.16:2543"
+
 # Check if the script is up to date
 # if ! wget -q -O /tmp/update.sh "http://192.168.21.33:2133/takeover.sh"; then
 #   echo "text,Failed Update" | nc -U /run/tinybox-screen.sock 2>/dev/null
@@ -156,7 +161,52 @@ else
 fi
 sleep 1
 
-echo "text,Flashing Image" | nc -U /run/tinybox-screen.sock 2>/dev/null
+# download the os image
+# first find a host that is accessible and that has both images
+selected_host=""
+for host in $IMG_HOSTS; do
+  if wget -q --spider "$host/tinyos.green.img" && wget -q --spider "$host/tinyos.red.img"; then
+    selected_host="$host"
+    break
+  fi
+done
+
+if [ -z "$selected_host" ]; then
+  echo "text,No Host Found" | nc -U /run/tinybox-screen.sock
+  exit 1
+else
+  echo "text,Using Host,$selected_host" | nc -U /run/tinybox-screen.sock
+fi
+
+if [ -n "$is_nvidia" ]; then
+  wget -b -o /tmp/log -O /tmp/tmp/tinyos.img "$selected_host/tinyos.green.img"
+else
+  wget -b -o /tmp/log -O /tmp/tmp/tinyos.img "$selected_host/tinyos.red.img"
+fi
+
+# wait until the image is downloaded
+while true; do
+  sleep 1
+
+  # extract the downloaded percentage from the log file
+  percentage=$(grep -oP '\d+%' /tmp/log | tail -n1)
+  # extract the estimated time left from the log file
+  time_left=$(grep -oP '(\d+m)?\d+s' /tmp/log | tail -n1)
+
+  echo "text,Downloading Image,$percentage - $time_left" | nc -U /run/tinybox-screen.sock
+
+  if ! pgrep -f "wget -b -o /tmp/log -O /tmp/tmp/tinyos.img" > /dev/null; then
+    break
+  fi
+done
+
+# see if the image was downloaded successfully by seeing if there is a 100% in the log file
+if ! grep -q "100%" /tmp/log; then
+  echo "text,Download Failed" | nc -U /run/tinybox-screen.sock
+  exit 1
+fi
+
+echo "text,Flashing Image" | nc -U /run/tinybox-screen.sock
 
 # get file size
 file_size=$(stat -c %s /tmp/tmp/tinyos.img)
