@@ -22,13 +22,32 @@ build-apkovl:
 	gzip -d localhost.apkovl.tar.gz
 	# Temporarily change directory to 'apkovl' and update the tarball with specific files, then return
 	# to the original directory
-	pushd apkovl && tar -uf ../localhost.apkovl.tar etc/network/interfaces --owner=0 --group=0
-	pushd apkovl && tar -uf ../localhost.apkovl.tar opt/tinybox/takeover.sh --owner=0 --group=0
+	# pushd apkovl && tar -uf ../localhost.apkovl.tar etc/network/interfaces --owner=0 --group=0
+	# pushd apkovl && tar -uf ../localhost.apkovl.tar opt/tinybox/takeover.sh --owner=0 --group=0
+	(cd apkovl && tar -uf ../localhost.apkovl.tar etc/passwd --owner=0 --group=0)
+	(cd apkovl && tar -uf ../localhost.apkovl.tar etc/shadow --owner=0 --group=0)
+	(cd apkovl && tar -uf ../localhost.apkovl.tar etc/network/interfaces --owner=0 --group=0)
+	(cd apkovl && tar -uf ../localhost.apkovl.tar opt/tinybox/takeover.sh --owner=0 --group=0)
 	# generate a new apkovl
 	# Compress the updated tarball
 	gzip localhost.apkovl.tar
 
 build: download-boot build-apkovl
+
+	# Create EFI image
+	echo "######### BUILDING EFI IMAGE #########"
+	# Create a 32MB image file for the EFI System Partition
+	dd if=/dev/zero of=boot/grub/efi.img bs=1M count=32
+  # Format the image file with a FAT filesystem
+	mkfs.vfat boot/grub/efi.img
+  # Mount the image file to copy the EFI files
+	sudo mount -o loop boot/grub/efi.img /mnt
+	# Copy the EFI files to the mounted image
+	sudo cp -r efi/boot/* /mnt
+	# Unmount the image file
+	sudo umount /mnt
+
+
 	# Run the img.sh script to create the image
 	bash ./img.sh
 

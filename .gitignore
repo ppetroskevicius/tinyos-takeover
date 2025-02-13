@@ -1,9 +1,11 @@
 .direnv/
 
 tmp/
-/*.gz
 *.img
 *.iso
 *.part
 
 boot/modloop-lts
+
+passwd
+shadow
