@@ -4,11 +4,26 @@ Builds an image that when booted will automatically flash the latest tinyos buil
 
 ## Usage
 
-Install the dependencies:
+Install the dependencies (without Nix):
 
 ```bash
 sudo apt install -y parted build-essential
 ```
+
+Install the dependencies (with Nix):
+
+```bash
+# Install Nix
+curl -L https://nixos.org/nix/install | sh -s -- --daemon
+
+# Install direnv (optional)
+sudo apt install direnv
+
+# Then use the development environment
+nix develop
+```
+
+Build iso image:
 
 ```bash
 make
@@ -21,6 +36,8 @@ make iso
 ```
 
 to build an iso that can be loaded over the BMC.
+
+The takeover image will fetch for an image from a http server, and flash it to the tinybox after doing some checks.
 
 ## Contents
 
@@ -75,4 +92,3 @@ to build an iso that can be loaded over the BMC.
 ├── flake.nix                                - Nix packages (flakes) manager file
 └── img.sh
 ```
-the takeover image will fetch for an image from a http server, and flash it to the tinybox after doing some checks.

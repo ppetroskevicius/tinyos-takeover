@@ -9,3 +9,5 @@ boot/modloop-lts
 
 passwd
 shadow
+
+.ropeproject
